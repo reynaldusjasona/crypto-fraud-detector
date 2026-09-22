@@ -216,3 +216,15 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Project-specific
+data/*.csv
+data/*.json
+data/*.parquet
+!data/.gitkeep
+models/*.pkl
+models/*.joblib
+models/*.json
+!models/.gitkeep
+.env
+*.ipynb_checkpoints/
