@@ -12,7 +12,7 @@ DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
 RAW_FILE = DATA_DIR / "transaction_dataset.csv"
 
 
-def load_raw_dataset(filepath: Path = RAW_FILE) -> pd.DataFrame:
+def load_raw_dataset(filepath: Path | str = RAW_FILE) -> pd.DataFrame:
     """Load the raw CSV dataset.
 
     Args:
@@ -21,6 +21,7 @@ def load_raw_dataset(filepath: Path = RAW_FILE) -> pd.DataFrame:
     Returns:
         Raw DataFrame with all columns from the dataset.
     """
+    filepath = Path(filepath)
     if not filepath.exists():
         raise FileNotFoundError(
             f"Dataset not found at {filepath}.\n"
@@ -67,7 +68,7 @@ def clean_dataset(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def load_dataset(filepath: Path = RAW_FILE) -> pd.DataFrame:
+def load_dataset(filepath: Path | str = RAW_FILE) -> pd.DataFrame:
     """Load and clean the dataset in one step.
 
     Returns:
