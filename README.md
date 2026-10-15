@@ -2,6 +2,8 @@
 
 ![Python](https://img.shields.io/badge/python-3.11+-blue.svg) ![Tests](https://img.shields.io/badge/tests-29%20passing-brightgreen.svg) ![Coverage](https://img.shields.io/badge/coverage-50%25-yellow.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
+**[▶ Live demo](https://crypto-fraud-detector-xxoqfcytu5ddftzcwqyeo3.streamlit.app)** — try it in your browser, no setup needed.
+
 Detect fraudulent Ethereum wallet addresses using graph-based feature engineering and machine learning classifiers.
 
 Given an Ethereum address, the system analyzes its transaction history, builds a local transaction graph, extracts structural and statistical features, and returns a fraud risk score with explanations.
