@@ -85,16 +85,16 @@ def load_predictor():
     return FraudPredictor()
 
 
-def local_model_info() -> dict | None:
+def local_model_info() -> tuple[dict | None, str | None]:
     try:
         p = load_predictor()
         return {
             "best_model": p.meta["best_model"],
             "feature_count": len(p.feature_names),
             "metrics": p.meta.get("metrics", {}),
-        }
-    except Exception:
-        return None
+        }, None
+    except Exception as exc:  # noqa: BLE001
+        return None, str(exc)
 
 
 def local_score(address: str) -> tuple[dict | None, str | None]:
@@ -111,8 +111,12 @@ def local_score(address: str) -> tuple[dict | None, str | None]:
 # --- pick mode once per session ---------------------------------------------
 
 USE_API = api_reachable()
-get_info = api_model_info if USE_API else local_model_info
 score_address = api_score if USE_API else local_score
+
+def get_info() -> tuple[dict | None, str | None]:
+    if USE_API:
+        return api_model_info(), None
+    return local_model_info()
 
 
 # --- UI ---------------------------------------------------------------------
@@ -120,14 +124,16 @@ score_address = api_score if USE_API else local_score
 st.title("Crypto Fraud Detector")
 st.caption("Score an Ethereum wallet address for fraud risk using graph-based ML.")
 
-info = get_info()
+info, info_err = get_info()
 if info is None:
-    st.error(
-        "Model is unavailable. "
-        + ("The API is running but has no model loaded." if USE_API
-           else "Could not load the model. Check that model files and the "
-                "ETHERSCAN_API_KEY secret are present.")
-    )
+    st.error("Model is unavailable.")
+    if info_err:
+        st.code(info_err, language="text")
+    if not USE_API:
+        st.caption(
+            "If this mentions ETHERSCAN_API_KEY, add it under the app's "
+            "Settings > Secrets as: ETHERSCAN_API_KEY = \"your_key\""
+        )
 else:
     cols = st.columns(3)
     cols[0].metric("Model", info["best_model"].upper())
