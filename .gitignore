@@ -228,3 +228,6 @@ models/*.json
 !models/.gitkeep
 .env
 *.ipynb_checkpoints/
+
+# macOS
+.DS_Store
