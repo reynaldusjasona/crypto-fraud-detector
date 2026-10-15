@@ -4,6 +4,14 @@ Detect fraudulent Ethereum wallet addresses using graph-based feature engineerin
 
 Given an Ethereum address, the system analyzes its transaction history, builds a local transaction graph, extracts structural and statistical features, and returns a fraud risk score with explanations.
 
+## Demo
+
+The dashboard scores a live address end to end: it calls the API, which fetches the address's transactions from Etherscan, extracts 24 features, runs the XGBoost model, and returns a risk score with SHAP explanations.
+
+![Dashboard scoring Vitalik Buterin's address as legitimate](public/proof.png)
+
+*Scoring `0xd8dA...96045` (vitalik.eth): LEGITIMATE, 0.0% fraud probability. High transaction counts lower the fraud score, which matches real behavior: fraud wallets tend to transact briefly then abandon the address.*
+
 ## Why this exists
 
 Blockchain fraud (wash trading, phishing, pump-and-dump schemes) costs billions annually. Tools like Chainalysis and Elliptic solve this at enterprise scale. This project demonstrates the same core approach at a portfolio scale: collect on-chain data, engineer meaningful features from transaction graphs, and train classifiers that distinguish fraudulent wallets from legitimate ones.
@@ -38,8 +46,8 @@ Blockchain fraud (wash trading, phishing, pump-and-dump schemes) costs billions 
       │  FastAPI        │         │  Streamlit     │
       │  REST API       │         │  Dashboard     │
       │                │         │                │
-      │  POST /score   │         │  - Risk score  │
-      │  GET /health   │         │  - Graph viz   │
+      │  POST /predict │         │  - Risk score  │
+      │  GET /health   │         │  - SHAP table  │
       └────────────────┘         │  - SHAP chart  │
                                  └────────────────┘
 ```
@@ -119,17 +127,36 @@ make collect
 # Train model
 make train
 
-# Start API server
+# Start the API server (keep this running)
 make api
 
-# Launch dashboard
+# In a second terminal, launch the dashboard
 make dashboard
+# then open http://localhost:8501
 ```
 
 ### Docker
 
 ```bash
 docker compose up --build
+```
+
+## API
+
+With the server running (`make api`), interactive docs are at `http://localhost:8000/docs`.
+
+| Method | Endpoint      | Description                                  |
+|--------|---------------|----------------------------------------------|
+| GET    | `/health`     | Liveness check and whether the model is loaded |
+| GET    | `/model/info` | Model type, feature list, and evaluation metrics |
+| POST   | `/predict`    | Score an address. Body: `{"address": "0x..."}` |
+
+Example:
+
+```bash
+curl -X POST http://localhost:8000/predict \
+  -H "Content-Type: application/json" \
+  -d '{"address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"}'
 ```
 
 ## Data sources
@@ -139,22 +166,23 @@ docker compose up --build
 
 ## Model performance
 
-*Results will be added after training is complete.*
+Trained on the Kaggle Ethereum Fraud Detection dataset (9,841 labeled addresses). XGBoost is the selected model.
 
-| Model          | Precision | Recall | F1    | AUC-ROC |
-|----------------|-----------|--------|-------|---------|
-| Random Forest  | -         | -      | -     | -       |
-| XGBoost        | -         | -      | -     | -       |
+| Model          | Precision | Recall | F1     | AUC-ROC |
+|----------------|-----------|--------|--------|---------|
+| Random Forest  | 0.904     | 0.860  | 0.881  | 0.982   |
+| XGBoost        | 0.929     | 0.869  | 0.898  | 0.985   |
 
 ## Roadmap
 
 - [x] Project scaffold and repo setup
-- [ ] Data collection pipeline (Etherscan API client + Kaggle loader)
-- [ ] Feature engineering (transaction, graph, statistical)
-- [ ] Model training and evaluation
-- [ ] FastAPI REST API
-- [ ] Streamlit dashboard with graph visualization
-- [ ] Docker deployment
+- [x] Data collection pipeline (Etherscan API client + Kaggle loader)
+- [x] Feature engineering (transaction, graph, statistical)
+- [x] Model training and evaluation
+- [x] FastAPI REST API
+- [x] Streamlit dashboard
+- [ ] Expand test coverage (collector, features, models)
+- [ ] Graph visualization in dashboard
 - [ ] Deploy dashboard to Streamlit Cloud
 
 ## License
