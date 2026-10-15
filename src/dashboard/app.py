@@ -11,6 +11,14 @@ Run locally with the API:  make api  (terminal 1), then
 """
 
 import os
+import sys
+from pathlib import Path
+
+# Make the project root importable so `import src...` works no matter how
+# this file is launched (streamlit run, pytest, etc.).
+_ROOT = Path(__file__).resolve().parent.parent.parent
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
 
 import pandas as pd
 import requests
