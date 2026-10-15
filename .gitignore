@@ -225,9 +225,14 @@ data/*.parquet
 models/*.pkl
 models/*.joblib
 models/*.json
+# Allow the small trained artifacts needed for deployment
 !models/.gitkeep
+!models/best_model.joblib
+!models/scaler.joblib
+!models/model_meta.json
 .env
 *.ipynb_checkpoints/
 
 # macOS
 .DS_Store
+

@@ -1,5 +1,7 @@
 # crypto-fraud-detector
 
+![Python](https://img.shields.io/badge/python-3.11+-blue.svg) ![Tests](https://img.shields.io/badge/tests-29%20passing-brightgreen.svg) ![Coverage](https://img.shields.io/badge/coverage-50%25-yellow.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg)
+
 Detect fraudulent Ethereum wallet addresses using graph-based feature engineering and machine learning classifiers.
 
 Given an Ethereum address, the system analyzes its transaction history, builds a local transaction graph, extracts structural and statistical features, and returns a fraud risk score with explanations.
@@ -158,6 +160,15 @@ curl -X POST http://localhost:8000/predict \
   -H "Content-Type: application/json" \
   -d '{"address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"}'
 ```
+
+## Testing
+
+```bash
+pytest -v                               # run all tests
+pytest --cov=src --cov-report=term-missing   # with coverage
+```
+
+29 tests cover the feature engineering, data cleaning, Etherscan client (HTTP mocked), and API endpoints. Core logic coverage: `transaction.py` 100%, `graph.py` and `statistical.py` 85%, API 86%. The training script, dashboard UI, and live Etherscan path are excluded by design.
 
 ## Data sources
 
